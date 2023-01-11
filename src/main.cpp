@@ -44,7 +44,7 @@ float C = Pi * D;
 // Custom Functions
 bool TeamRed = true;
 color AllianceColor = white;
-int AutonSelected = 1; 
+int AutonSelected = 3; 
 AutonOption selectedOption = ALL;
 
 double OldError = 0.0;
@@ -137,6 +137,7 @@ void inchDriveForward(float target, int speed)                 //takes target di
 {
     float x=0;                                                         //variable that will be current distance
   
+  int revStart = LF.rotation(rev);
   while(x<=target)                                                //proportional control feedback loop for error
   {
     RF.spin(forward,speed,pct);
@@ -144,13 +145,33 @@ void inchDriveForward(float target, int speed)                 //takes target di
     RB.spin(forward,speed,pct);
     LB.spin(forward,speed*0.89,pct);
     wait(10,msec);
-    x=LF.rotation(rev)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
+    x=(LF.rotation(rev) - revStart)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
   }
      LF.stop(brake);                                              //stops motors once target is reached and loop finishes
      RF.stop(brake);
      LB.stop(brake);
      RB.stop(brake);                                             //optional braking, will make motion more fluid
 }
+
+void inchDriveBackward(float target, int speed)                 //takes target distance and speed as parameters
+{
+    float x=0;                                                         //variable that will be current distance
+  int revStart = -RF.rotation(rev);
+  while(x<=target)                                                //proportional control feedback loop for error
+  {
+    LF.spin(reverse,speed,pct);
+    RF.spin(reverse,speed*0.89,pct);
+    RB.spin(reverse,speed*0.89,pct);
+    LB.spin(reverse,speed,pct);
+    wait(10,msec);
+    x=(-RF.rotation(rev) - revStart)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
+  }
+     LF.stop(brake);                                              //stops motors once target is reached and loop finishes
+     RF.stop(brake);
+     LB.stop(brake);
+     RB.stop(brake);                                             //optional braking, will make motion more fluid
+}
+
 
 void inchDriveRight(float target, int speed)                 //takes target distance and speed as parameters
 {
@@ -190,24 +211,6 @@ void inchDriveLeft(float target, int speed)                 //takes target dista
      RB.stop(brake);                                             //optional braking, will make motion more fluid
 }
 
-void inchDriveBackward(float target, int speed)                 //takes target distance and speed as parameters
-{
-    float x=0;                                                         //variable that will be current distance
-  
-  while(x<=target)                                                //proportional control feedback loop for error
-  {
-    LF.spin(reverse,speed,pct);
-    RF.spin(reverse,speed,pct);
-    RB.spin(reverse,speed,pct);
-    LB.spin(reverse,speed,pct);
-    wait(10,msec);
-    x=LF.rotation(rev)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
-  }
-     LF.stop(brake);                                              //stops motors once target is reached and loop finishes
-     RF.stop(brake);
-     LB.stop(brake);
-     RB.stop(brake);                                             //optional braking, will make motion more fluid
-}
 
 
 void driveBrake() {
@@ -311,6 +314,52 @@ void diskLaunch(int DiskQuantity)
   
  Brain.Screen.printAt(175, 75, "after For");
   F1.stop();
+}
+
+void ProgrammingSkills() 
+{
+  // ..........................................................................
+  // Inset autonomous user code here for the programming skills run.
+  // ..........................................................................
+//  Brain.Screen.printAt(1, 20, "Auton is running");
+//1/10/2023 first auton, 2 discs into high goal and 1 roller turned
+
+    // diskLaunch(2);
+    // wait(1, seconds);
+
+    // inchDriveForward(20, 50);
+    // wait(500, msec);
+    
+    // RF.spin(fwd, 50, pct);
+    // RB.spin(fwd, 50, pct);
+    // wait(1500, msec);
+    // RB.stop();
+    // RF.stop();
+    
+    // turnRoller();
+
+    inchDriveBackward(20, 50);
+
+    //go to the second roller
+    // LB.spin(reverse,50, pct);
+    // RF.spin(reverse,50, pct);
+    // wait (1300, msec);
+    // RF.stop();
+    // LB.stop();
+
+    //turn towards the second roller
+    LF.spin(fwd, 50, pct);
+    LB.spin(fwd, 50, pct);
+    wait(1250, msec);
+    LB.stop();
+    LF.stop();
+
+    inchDriveForward(11,30);
+
+    turnRoller();
+
+    //inchDriveBackward(10, 50);
+    wait(500, msec);
 }
 
 void autonFront() 
@@ -552,7 +601,7 @@ void auton()
         // need to write this code.
       break;
     case 3: //programming skills
-        // add code
+      ProgrammingSkills();
       break;  
   }
 }
