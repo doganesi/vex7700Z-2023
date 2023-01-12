@@ -16,6 +16,7 @@
 #include "v5_vcs.h"
 
 #include "robot-config.h"
+#include "janik.h"
 
 #define waitUntil(condition)                                                   \
   do {                                                                         \

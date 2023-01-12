@@ -43,7 +43,7 @@ float D = 4.0;
 float C = Pi * D;
 // Custom Functions
 bool TeamRed = true;
-color AllianceColor = white;
+color AllianceColor = red;
 int AutonSelected = 3; 
 AutonOption selectedOption = ALL;
 
@@ -52,8 +52,8 @@ double TBHval = 0.0;
 double FWDrive = 0.0;
 
 int IndexerSpeed = 65;
-int IndexerBreak = 1000;
-int IndexerActiveTime = 250;//400;
+int IndexerBreak = 1100;
+int IndexerActiveTime = 375;//400;
 
 
 
@@ -261,44 +261,33 @@ void gyroTurn(float target) {
 
 void turnRoller()
 {
-  //CS.setLightPower(100);
-  
-
   CS.setLightPower(100);
   wait(500, msec);
   Intake.spin(fwd, -60, percent);
+  Brain.Screen.clearScreen();
      
     if(AllianceColor == red)
+    {
+      while(CS.color() != red)
       {
-
-        while(CS.color() != red)
-        {
-          //RF.spin(fwd, 30, pct);
-          Intake.spin(forward, -70, percent);
-          wait(10,msec);
-          //color = CS.color();
-        } 
-      }
-
+        wait(5, msec);
+      } 
+    }
     else
     {
       while(CS.color() != blue)
       {
-        //Indexer.spin(fwd, 30, pct);
-        Intake.spin(forward, -70, percent);
-        wait(10,msec);
-        //color = CS.color();
+        wait(5, msec);
       }
     }
-
-    //wait(1, sec);
-
+    wait(3, msec);
     Intake.stop(brake);
-  }
+    CS.setLightPower(0);
+}
 
 void diskLaunch(int DiskQuantity)
 {
-  F1.spin(fwd, -75, pct);
+  F1.spin(fwd, -69, pct);
   wait(3000,  msec);
   Brain.Screen.clearScreen();
 
@@ -313,8 +302,28 @@ void diskLaunch(int DiskQuantity)
   }
   
  Brain.Screen.printAt(175, 75, "after For");
+
+  wait(500, msec);
+
   F1.stop();
 }
+
+void ProgrammingSkillsAlt() 
+{
+  Janik janik(red);
+  janik.diskLaunch(2);
+
+  janik.inchDriveForward(25, 50);
+  janik.turnToRoller1();
+  janik.spinRoller();
+
+  janik.inchDriveBackward(15, 50);
+  janik.turnToRoller2();
+  janik.inchDriveForward(15, 30);
+  janik.spinRoller();
+  janik.moveDiagonally(2000);
+}
+
 
 void ProgrammingSkills() 
 {
@@ -324,39 +333,76 @@ void ProgrammingSkills()
 //  Brain.Screen.printAt(1, 20, "Auton is running");
 //1/10/2023 first auton, 2 discs into high goal and 1 roller turned
 
-    // diskLaunch(2);
-    // wait(1, seconds);
+    diskLaunch(2);
+    //wait(1, seconds);
 
-    // inchDriveForward(20, 50);
-    // wait(500, msec);
+    inchDriveForward(20, 50);
+    //wait(500, msec);
     
-    // RF.spin(fwd, 50, pct);
-    // RB.spin(fwd, 50, pct);
-    // wait(1500, msec);
-    // RB.stop();
-    // RF.stop();
+    RF.spin(fwd, 50, pct);
+    RB.spin(fwd, 50, pct);
+    wait(1500, msec);
+    RB.stop();
+    RF.stop();
     
-    // turnRoller();
+    turnRoller();
 
-    inchDriveBackward(20, 50);
+    //wait(2, sec);
 
-    //go to the second roller
+    inchDriveBackward(13, 50);
+
+    wait(2, sec);
+
+    //go to the second roller diagonally
     // LB.spin(reverse,50, pct);
     // RF.spin(reverse,50, pct);
     // wait (1300, msec);
     // RF.stop();
     // LB.stop();
 
-    //turn towards the second roller
+    // //turn towards the second roller
     LF.spin(fwd, 50, pct);
     LB.spin(fwd, 50, pct);
-    wait(1250, msec);
+    wait(1280, msec);
     LB.stop();
     LF.stop();
 
     inchDriveForward(11,30);
 
     turnRoller();
+
+
+//Crossing the field to the other rollers
+      LB.spin(reverse, 75, pct);
+      RF.spin(reverse, 75, pct);
+
+      wait(3000, msec); //
+
+      // wait(4500, msec); //across the diagonal
+
+      LB.stop();
+      RF.stop();
+
+      // wait(500, msec);
+
+      // inchDriveBackward(24.5, 30);
+
+      // wait(250, msec);
+
+      // LF.spin(fwd, 50, pct);
+      // LB.spin(fwd, 50, pct);
+      // wait(1280, msec);
+      // LB.stop();
+      // LF.stop();
+
+//End crossing the field to other rollers
+
+
+
+
+
+
+
 
     //inchDriveBackward(10, 50);
     wait(500, msec);
@@ -383,6 +429,7 @@ void autonFront()
     RF.stop();
     
     turnRoller();
+
 }
 
 void autonOld() {
@@ -601,7 +648,7 @@ void auton()
         // need to write this code.
       break;
     case 3: //programming skills
-      ProgrammingSkills();
+      ProgrammingSkillsAlt();
       break;  
   }
 }
@@ -621,7 +668,7 @@ void pre_auton() {
 int main() {
 
   // Set up callbacks for autonomous and driver control periods.
- Competition.autonomous(auton);
+ //Competition.autonomous(auton);
  //Competition.drivercontrol(driver);
   
 
