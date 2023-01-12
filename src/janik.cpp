@@ -7,30 +7,45 @@ Janik::Janik(color allianceColor)
   cAllianceColor = allianceColor;
 }
 
-void Janik::spinRoller()
+void Janik::spinRollerHalf() //starts with one color facing the field
 {
-  //CS.setLightPower(100);
-  //wait(500, msec);
-  Brain.Screen.clearScreen();
+  Intake.spin(fwd, -60, percent);
+  wait(160, msec);
+  Intake.stop(brake);
+}
+
+
+void Janik::spinRollerFull() //starts with one color facing up
+{
+  Intake.spin(fwd, -60, percent);
+  wait(300, msec);
+  Intake.stop(brake);
+}
+
+void Janik::spinRoller() //Use optical sensor
+{
+  CS.setLightPower(100);
+  wait(500, msec);
+  //Brain.Screen.clearScreen();
   Intake.spin(fwd, -60, percent);
      
-    // if(cAllianceColor == red)
-    // {
-    //   while(CS.color() != red)
-    //   {
-    //     wait(5, msec);
-    //   } 
-    // }
-    // else
-    // {
-    //   while(CS.color() != blue)
-    //   {
-    //     wait(5, msec);
-    //   }
-    // }
-    wait(150, msec);
+    if(cAllianceColor == red)
+    {
+      while(CS.color() != red)
+      {
+        wait(5, msec);
+      } 
+    }
+    else
+    {
+      while(CS.color() != blue)
+      {
+        wait(5, msec);
+      }
+    }
+  
     Intake.stop(brake);
-    //CS.setLightPower(0);
+    CS.setLightPower(0);
 }
 
 void Janik::diskLaunch(int DiskQuantity)
@@ -49,6 +64,11 @@ void Janik::diskLaunch(int DiskQuantity)
   wait(500, msec);
 
   F1.stop();
+}
+void Janik::deployExpansion() 
+{
+     Pneu1.set(true);
+     Pneu2.set(true);
 }
 
 void Janik::inchDriveForward(float target, int speed)                 //takes target distance and speed as parameters
@@ -89,6 +109,50 @@ void Janik::inchDriveBackward(float target, int speed)                 //takes t
   RF.stop(brake);
   LB.stop(brake);
   RB.stop(brake);                                             //optional braking, will make motion more fluid
+}
+
+void Janik::rotateLeft(int rotationTime, int speed) // 600 rotates 90 degrees
+{
+    RF.spin(fwd, speed, pct);
+    RB.spin(fwd, speed, pct);
+    LF.spin(reverse, speed, pct);
+    LB.spin(reverse, speed, pct);
+    wait(rotationTime, msec);
+    RB.stop();
+    RF.stop();
+    LB.stop();
+    LF.stop();
+}
+
+void Janik::rotateRight(int rotationTime, int speed)
+{
+    LF.spin(fwd, speed, pct);
+    LB.spin(fwd, speed, pct);
+    RF.spin(reverse, speed, pct);
+    RB.spin(reverse, speed, pct);
+    wait(rotationTime, msec);
+    RB.stop();
+    RF.stop();  
+    LB.stop();
+    LF.stop();  
+}
+
+void Janik::turnLeft(int turnTime, int speed)
+{
+    RF.spin(fwd, speed, pct);
+    RB.spin(fwd, speed, pct);
+    wait(turnTime, msec);
+    RB.stop();
+    RF.stop();
+}
+
+void Janik::turnRight(int turnTime, int speed)
+{
+    LF.spin(fwd, speed, pct);
+    LB.spin(fwd, speed, pct);
+    wait(turnTime, msec);
+    LB.stop();
+    LF.stop();
 }
 
 void Janik::turnToRoller1()

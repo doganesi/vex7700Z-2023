@@ -33,6 +33,7 @@ using namespace vex;
 competition Competition;
 
 // define your global Variables here
+Janik janik(red);
 
 enum AutonOption {ALL, RED_RIGHT, RED_FRONT, BLUE_RIGHT, BLUE_FRONT, PROG };
 
@@ -44,7 +45,7 @@ float C = Pi * D;
 // Custom Functions
 bool TeamRed = true;
 color AllianceColor = red;
-int AutonSelected = 3; 
+int AutonSelected = 0; 
 AutonOption selectedOption = ALL;
 
 double OldError = 0.0;
@@ -310,18 +311,37 @@ void diskLaunch(int DiskQuantity)
 
 void ProgrammingSkillsAlt() 
 {
-  Janik janik(red);
-  janik.diskLaunch(2);
+  
+  janik.diskLaunch(2); //Launch preloads
 
   janik.inchDriveForward(25, 50);
-  janik.turnToRoller1();
-  janik.spinRoller();
+  janik.turnLeft(1500, 50);
+
+  janik.spinRollerFull(); //First Roller
 
   janik.inchDriveBackward(15, 50);
-  janik.turnToRoller2();
-  janik.inchDriveForward(15, 30);
-  janik.spinRoller();
-  janik.moveDiagonally(2000);
+  janik.turnRight(1300, 50);
+  janik.inchDriveForward(15, 50);
+
+  janik.spinRollerFull(); //Second Roller
+
+  janik.moveDiagonally(2000); //4500 takes across the full diagonal
+  janik.inchDriveBackward(24.5, 30);
+  janik.turnRight(1280, 50);
+  
+  janik.spinRollerFull(); //Third Roller
+
+  janik.inchDriveBackward(15, 50);
+  janik.turnRight(1300, 50);
+  janik.inchDriveForward(15, 50);
+
+  janik.spinRollerFull(); //Fourth Roller
+
+  janik.inchDriveBackward(10,50);
+  janik.rotateLeft(600, 50);
+
+  janik.deployExpansion(); //Expand
+
 }
 
 
@@ -353,12 +373,6 @@ void ProgrammingSkills()
 
     wait(2, sec);
 
-    //go to the second roller diagonally
-    // LB.spin(reverse,50, pct);
-    // RF.spin(reverse,50, pct);
-    // wait (1300, msec);
-    // RF.stop();
-    // LB.stop();
 
     // //turn towards the second roller
     LF.spin(fwd, 50, pct);
@@ -408,27 +422,26 @@ void ProgrammingSkills()
     wait(500, msec);
 }
 
+void autonRight()
+{
+  janik.diskLaunch(2);
+
+  janik.inchDriveForward(19, 50);
+  janik.turnRight(1300, 50);
+
+  janik.spinRollerHalf();
+}
+
 void autonFront() 
 {
-  // ..........................................................................
-  // Inset autonomous user code here for the robot position to the left of the alliance goal.
-  // ..........................................................................
-//  Brain.Screen.printAt(1, 20, "Auton is running");
-//1/10/2023 first auton, 2 discs into high goal and 1 roller turned
 
-    diskLaunch(2);
-    wait(1, seconds);
+  janik.diskLaunch(2);
 
-    inchDriveForward(20, 50);
-    wait(500, msec);
-    
-    RF.spin(fwd, 50, pct);
-    RB.spin(fwd, 50, pct);
-    wait(1500, msec);
-    RB.stop();
-    RF.stop();
-    
-    turnRoller();
+  janik.inchDriveForward(19, 50);
+  janik.turnLeft(1500, 50);
+  
+  janik.spinRollerHalf();
+  
 
 }
 
@@ -623,6 +636,7 @@ void selectAuton()
   {
     AllianceColor = red; //TurnRoller will turn the rollers to RED
     AutonSelected = 3;    //Robot starts programming skills run
+    selectedOption=PROG;
     drawGUIAutonSelector();
     Brain.Screen.printAt(1, 210, "Programming Skills Selected");
    }
@@ -631,6 +645,9 @@ void selectAuton()
 
 
 void auton()
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
 {
 
   switch (AutonSelected)
@@ -645,7 +662,7 @@ void auton()
       break;
      }
     case 2: //robot to the right of the alliance high goal
-        // need to write this code.
+      autonRight();
       break;
     case 3: //programming skills
       ProgrammingSkillsAlt();
@@ -657,8 +674,8 @@ void pre_auton() {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
 
-  //drawGUIAutonSelector();
-  //Brain.Screen.pressed(selectAuton);
+  drawGUIAutonSelector();
+  Brain.Screen.pressed(selectAuton);
 
   
   // All activities that occur before the competition starts
@@ -668,13 +685,13 @@ void pre_auton() {
 int main() {
 
   // Set up callbacks for autonomous and driver control periods.
- //Competition.autonomous(auton);
- //Competition.drivercontrol(driver);
+ Competition.autonomous(auton);
+ Competition.drivercontrol(driver);
   
 
   // Run the pre-autonomous function.
  pre_auton();
- auton();
+ //auton();
 
  
 
