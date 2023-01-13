@@ -29,8 +29,6 @@ class Janik
     void turnRight(int turnTime, int speed);
     void rotateLeft(int rotationTime, int speed);
     void rotateRight(int rotationTime, int speed);
-
-    void turnToRoller1();
-    void turnToRoller2();
+    
     void moveDiagonally(int driveTime);
 };

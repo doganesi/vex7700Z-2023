@@ -111,39 +111,39 @@ void Janik::inchDriveBackward(float target, int speed)                 //takes t
   RB.stop(brake);                                             //optional braking, will make motion more fluid
 }
 
-void Janik::rotateLeft(int rotationTime, int speed) // 600 rotates 90 degrees
+void Janik::rotateLeft(int rotationTime, int speed) // 600 rotates 90 degrees at 50 speed
 {
     RF.spin(fwd, speed, pct);
     RB.spin(fwd, speed, pct);
     LF.spin(reverse, speed, pct);
     LB.spin(reverse, speed, pct);
     wait(rotationTime, msec);
-    RB.stop();
-    RF.stop();
-    LB.stop();
-    LF.stop();
+    LF.stop(brake);                                              //stops motors once target is reached and loop finishes
+    RF.stop(brake);
+    LB.stop(brake);
+    RB.stop(brake);  
+
 }
 
-void Janik::rotateRight(int rotationTime, int speed)
+void Janik::rotateRight(int rotationTime, int speed) // 585? rotates 90 degrees at 50 speed
 {
     LF.spin(fwd, speed, pct);
     LB.spin(fwd, speed, pct);
     RF.spin(reverse, speed, pct);
     RB.spin(reverse, speed, pct);
     wait(rotationTime, msec);
-    RB.stop();
-    RF.stop();  
-    LB.stop();
-    LF.stop();  
+    LF.stop(brake);                                              //stops motors once target is reached and loop finishes
+    RF.stop(brake);
+    LB.stop(brake);
+    RB.stop(brake);  
 }
-
 void Janik::turnLeft(int turnTime, int speed)
 {
     RF.spin(fwd, speed, pct);
     RB.spin(fwd, speed, pct);
     wait(turnTime, msec);
-    RB.stop();
-    RF.stop();
+    RB.stop(brake);
+    RF.stop(brake);
 }
 
 void Janik::turnRight(int turnTime, int speed)
@@ -151,27 +151,11 @@ void Janik::turnRight(int turnTime, int speed)
     LF.spin(fwd, speed, pct);
     LB.spin(fwd, speed, pct);
     wait(turnTime, msec);
-    LB.stop();
-    LF.stop();
+    LB.stop(brake);
+    LF.stop(brake);
 }
 
-void Janik::turnToRoller1()
-{
-    RF.spin(fwd, 50, pct);
-    RB.spin(fwd, 50, pct);
-    wait(1500, msec);
-    RB.stop();
-    RF.stop();
-}
 
-void Janik::turnToRoller2()
-{
-    LF.spin(fwd, 50, pct);
-    LB.spin(fwd, 50, pct);
-    wait(1300, msec);
-    LB.stop();
-    LF.stop();
-}
 
 void Janik::moveDiagonally(int driveTime)
 {
@@ -182,6 +166,6 @@ void Janik::moveDiagonally(int driveTime)
 
   // wait(4500, msec); //across the diagonal
 
-    LB.stop();
-    RF.stop();
+    LB.stop(brake);
+    RF.stop(brake);
 }

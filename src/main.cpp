@@ -43,8 +43,7 @@ float Pi = 3.14;
 float D = 4.0;
 float C = Pi * D;
 // Custom Functions
-bool TeamRed = true;
-color AllianceColor = red;
+color AllianceColor = white;
 int AutonSelected = 0; 
 AutonOption selectedOption = ALL;
 
@@ -106,10 +105,11 @@ void drive(int lspeed, int rspeed, int wt) {
 }
 
 void xDrive(int speed, int strafe, int spin, int wt) {
-  LF.spin(forward, speed + strafe + spin, percent);
-  LB.spin(forward, speed - strafe + spin, percent);
-  RF.spin(forward, speed - strafe - spin, percent);
-  RB.spin(forward, speed + strafe - spin, percent);
+  int spinSpeed = spin*0.75;
+  LF.spin(forward, speed + strafe + spinSpeed, percent);
+  LB.spin(forward, speed - strafe + spinSpeed, percent);
+  RF.spin(forward, speed - strafe - spinSpeed, percent);
+  RB.spin(forward, speed + strafe - spinSpeed, percent);
   wait(wt, msec);
 }
 
@@ -133,45 +133,6 @@ void xDrive(int speed, int strafe, int spin, int wt) {
 //   Brain.Screen.printAt(1, 100, "RB current= %.2f   termperature = %.2f",
 //                        currentRB, tempRB);
 // }
-
-void inchDriveForward(float target, int speed)                 //takes target distance and speed as parameters
-{
-    float x=0;                                                         //variable that will be current distance
-  
-  int revStart = LF.rotation(rev);
-  while(x<=target)                                                //proportional control feedback loop for error
-  {
-    RF.spin(forward,speed,pct);
-    LF.spin(forward,speed*0.89,pct);
-    RB.spin(forward,speed,pct);
-    LB.spin(forward,speed*0.89,pct);
-    wait(10,msec);
-    x=(LF.rotation(rev) - revStart)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
-  }
-     LF.stop(brake);                                              //stops motors once target is reached and loop finishes
-     RF.stop(brake);
-     LB.stop(brake);
-     RB.stop(brake);                                             //optional braking, will make motion more fluid
-}
-
-void inchDriveBackward(float target, int speed)                 //takes target distance and speed as parameters
-{
-    float x=0;                                                         //variable that will be current distance
-  int revStart = -RF.rotation(rev);
-  while(x<=target)                                                //proportional control feedback loop for error
-  {
-    LF.spin(reverse,speed,pct);
-    RF.spin(reverse,speed*0.89,pct);
-    RB.spin(reverse,speed*0.89,pct);
-    LB.spin(reverse,speed,pct);
-    wait(10,msec);
-    x=(-RF.rotation(rev) - revStart)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
-  }
-     LF.stop(brake);                                              //stops motors once target is reached and loop finishes
-     RF.stop(brake);
-     LB.stop(brake);
-     RB.stop(brake);                                             //optional braking, will make motion more fluid
-}
 
 
 void inchDriveRight(float target, int speed)                 //takes target distance and speed as parameters
@@ -220,96 +181,15 @@ void driveBrake() {
   RF.stop(brake);
   RB.stop(brake);
 }
-void driveCoast() {
-  LF.stop(brake);
-  LB.stop(brake);
-  RF.stop(brake);
-  RB.stop(brake);
-}
 
-void inchdrive(float target) {
-  float x = 0;
 
-  LF.setRotation(0, rev);
-  while (x <= target) {
-    drive(50, 50, 10);
-    x = LF.rotation(rev) * C;
-  }
-  driveBrake();
-}
 
-void gyroTurn(float target) {
-  float heading = 0.0;
-  float error = target;
-  float olderror = error;
-  float speed = 0.0;
-  float kp = 5.0;
-  float kd = 5.0;
-  float ki = 0.0;
-  float i = 0.0;
-  // target = target - 21;
-  GyroSensor.setRotation(0, degrees);
-  while (error > 2) {
-    heading = GyroSensor.rotation(degrees);
-    olderror = error;
-    error = target - heading;
-    speed = kp * error + kd * (error - olderror);
-    drive(speed, -speed, 10);
-    // Brain.Screen.printAt(1, 40 "heading == %.2f   ", heading);
-  }
-  driveBrake();
-}
 
-void turnRoller()
-{
-  CS.setLightPower(100);
-  wait(500, msec);
-  Intake.spin(fwd, -60, percent);
-  Brain.Screen.clearScreen();
-     
-    if(AllianceColor == red)
-    {
-      while(CS.color() != red)
-      {
-        wait(5, msec);
-      } 
-    }
-    else
-    {
-      while(CS.color() != blue)
-      {
-        wait(5, msec);
-      }
-    }
-    wait(3, msec);
-    Intake.stop(brake);
-    CS.setLightPower(0);
-}
 
-void diskLaunch(int DiskQuantity)
-{
-  F1.spin(fwd, -69, pct);
-  wait(3000,  msec);
-  Brain.Screen.clearScreen();
 
-  for(int i = 0; i < DiskQuantity; i++) 
-  {
-    
-    Brain.Screen.printAt(20, 20+i*15,"Inside For");
-    Indexer.spin(fwd, IndexerSpeed, pct);
-    wait(IndexerActiveTime, msec);
-    Indexer.stop();
-    wait(IndexerBreak, msec);
-  }
-  
- Brain.Screen.printAt(175, 75, "after For");
 
-  wait(500, msec);
 
-  F1.stop();
-}
-
-void ProgrammingSkillsAlt() 
+void ProgrammingSkills() 
 {
   
   janik.diskLaunch(2); //Launch preloads
@@ -345,83 +225,6 @@ void ProgrammingSkillsAlt()
 }
 
 
-void ProgrammingSkills() 
-{
-  // ..........................................................................
-  // Inset autonomous user code here for the programming skills run.
-  // ..........................................................................
-//  Brain.Screen.printAt(1, 20, "Auton is running");
-//1/10/2023 first auton, 2 discs into high goal and 1 roller turned
-
-    diskLaunch(2);
-    //wait(1, seconds);
-
-    inchDriveForward(20, 50);
-    //wait(500, msec);
-    
-    RF.spin(fwd, 50, pct);
-    RB.spin(fwd, 50, pct);
-    wait(1500, msec);
-    RB.stop();
-    RF.stop();
-    
-    turnRoller();
-
-    //wait(2, sec);
-
-    inchDriveBackward(13, 50);
-
-    wait(2, sec);
-
-
-    // //turn towards the second roller
-    LF.spin(fwd, 50, pct);
-    LB.spin(fwd, 50, pct);
-    wait(1280, msec);
-    LB.stop();
-    LF.stop();
-
-    inchDriveForward(11,30);
-
-    turnRoller();
-
-
-//Crossing the field to the other rollers
-      LB.spin(reverse, 75, pct);
-      RF.spin(reverse, 75, pct);
-
-      wait(3000, msec); //
-
-      // wait(4500, msec); //across the diagonal
-
-      LB.stop();
-      RF.stop();
-
-      // wait(500, msec);
-
-      // inchDriveBackward(24.5, 30);
-
-      // wait(250, msec);
-
-      // LF.spin(fwd, 50, pct);
-      // LB.spin(fwd, 50, pct);
-      // wait(1280, msec);
-      // LB.stop();
-      // LF.stop();
-
-//End crossing the field to other rollers
-
-
-
-
-
-
-
-
-    //inchDriveBackward(10, 50);
-    wait(500, msec);
-}
-
 void autonRight()
 {
   janik.diskLaunch(2);
@@ -439,60 +242,18 @@ void autonFront()
 
   janik.inchDriveForward(19, 50);
   janik.turnLeft(1500, 50);
-  
+
   janik.spinRollerHalf();
   
 
 }
 
-void autonOld() {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
-  Brain.Screen.printAt(1, 20, "Auton is running");
-//1/10/2023 first auton, 2 discs into high goal and 1 roller turned
 
-  F1.spin(fwd, -75, pct);
-
-  wait(3000,  msec);
-  
-  Indexer.spin(fwd, IndexerSpeed, pct);
-  wait(IndexerActiveTime - 250, msec);
-  Indexer.stop();
-  Indexer.spin(reverse, IndexerSpeed, pct);
-  wait(IndexerBreak + 650, msec);
-  Indexer.spin(fwd, IndexerSpeed, pct);
-  wait(IndexerActiveTime - 250 , msec);
-  Indexer.stop();
-  Indexer.spin(reverse, IndexerSpeed, pct);
-  wait(IndexerBreak + 750, msec);
-  Indexer.spin(fwd, IndexerSpeed, pct);
-  wait(IndexerActiveTime + 600, msec);
-  Indexer.stop();
-  F1.stop();
-
-  wait(2, seconds);
-
-  inchDriveForward(20, 50);
-
-  wait(500, msec);
-  RF.spin(fwd, 50, pct);
-  RB.spin(fwd, 50, pct);
-  wait(1500, msec);
-  RB.stop();
-  RF.stop();
-  wait(1, sec);
-  CS.setLightPower(100);
-
-  turnRoller();
-}
-
-void pushPneu1(bool push) { Pneu1.set(push); }
 
 void driver() {
   int count = 0;
   int targetSpeed = 0;
-  driveCoast();
+  driveBrake();
   // User control code here, inside the loop
   while (true) 
   {
@@ -538,8 +299,8 @@ void driver() {
     Indexer.spin(fwd, 50, pct);
   else if (Controller1.ButtonR2.pressing())
     Indexer.spin(fwd, -50, pct);
-  //else
-    //Indexer.spin(fwd, 0, pct);
+  else
+    Indexer.spin(fwd, 0, pct);
 
   }
 
@@ -665,7 +426,7 @@ void auton()
       autonRight();
       break;
     case 3: //programming skills
-      ProgrammingSkillsAlt();
+      ProgrammingSkills();
       break;  
   }
 }
