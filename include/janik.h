@@ -1,11 +1,15 @@
+#include <cmath>
+
 using namespace vex;
 
 class Janik
 {
   int IndexerSpeed = 65;
   int IndexerBreak = 1100;
-  int IndexerActiveTime = 375;//400;
-  float dia=4.0;
+  int IndexerActiveTime = 300;//400;
+  double wheelDiameter = 4.0;
+  double PI  = 3.1415926;
+  double xDriveCoeff = sqrt(2.0);
 
   public:
     color cAllianceColor;
@@ -22,8 +26,11 @@ class Janik
 
 // Movement functions
 
-    void inchDriveForward(float target, int speed);
-    void inchDriveBackward(float target, int speed);
+    void inchDriveForward(double target, int speed);
+    void inchDriveBackward(double target, int speed);
+    void driveForward(double target, double speed); //target = distance in inches
+    void driveBackwards(double target, double speed);
+
 
     void turnLeft(int turnTime, int speed);
     void turnRight(int turnTime, int speed);

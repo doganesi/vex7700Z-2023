@@ -194,31 +194,40 @@ void ProgrammingSkills()
   
   janik.diskLaunch(2); //Launch preloads
 
-  janik.inchDriveForward(25, 50);
+  //janik.inchDriveForward(25, 50);
+  janik.turnRight(120, 50); //straighten
+  janik.driveForward(27, 50);
   janik.turnLeft(1500, 50);
-
+  
   janik.spinRollerFull(); //First Roller
 
-  janik.inchDriveBackward(15, 50);
+  janik.driveBackwards(28, 50);
   janik.turnRight(1300, 50);
-  janik.inchDriveForward(15, 50);
+  janik.driveForward(13.5, 50);
+
+  wait(100, msec);
+  // janik.inchDriveForward(17, 50);
 
   janik.spinRollerFull(); //Second Roller
 
-  janik.moveDiagonally(2000); //4500 takes across the full diagonal
-  janik.inchDriveBackward(24.5, 30);
-  janik.turnRight(1280, 50);
+  janik.driveBackwards(22, 50);
   
-  janik.spinRollerFull(); //Third Roller
+  janik.turnLeft(1250, 50);
 
-  janik.inchDriveBackward(15, 50);
-  janik.turnRight(1300, 50);
-  janik.inchDriveForward(15, 50);
+  // janik.moveDiagonally(4500); //4500 takes across the full diagonal
+  // janik.inchDriveBackward(24.5, 30);
+  // janik.turnLeft(1280, 50);
+  
+  // janik.spinRollerFull(); //Third Roller
 
-  janik.spinRollerFull(); //Fourth Roller
+  // janik.inchDriveBackward(13, 50);
+  // janik.turnRight(1300, 50);
+  // janik.inchDriveForward(17, 50);
 
-  janik.inchDriveBackward(10,50);
-  janik.rotateLeft(600, 50);
+  // janik.spinRollerFull(); //Fourth Roller
+
+  // janik.inchDriveBackward(10,50);
+  // janik.rotateLeft(600, 50);
 
   janik.deployExpansion(); //Expand
 
@@ -228,8 +237,9 @@ void ProgrammingSkills()
 void autonRight()
 {
   janik.diskLaunch(2);
+  janik.turnLeft(120,50);
 
-  janik.inchDriveForward(19, 50);
+  janik.driveForward(26, 50);
   janik.turnRight(1300, 50);
 
   janik.spinRollerHalf();
@@ -240,12 +250,11 @@ void autonFront()
 
   janik.diskLaunch(2);
 
-  janik.inchDriveForward(19, 50);
+  janik.turnRight(120, 50);
+  janik.driveForward(26, 50);
   janik.turnLeft(1500, 50);
-
-  janik.spinRollerHalf();
   
-
+  janik.spinRollerHalf();  
 }
 
 

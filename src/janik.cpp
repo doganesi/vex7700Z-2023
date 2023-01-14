@@ -71,19 +71,69 @@ void Janik::deployExpansion()
      Pneu2.set(true);
 }
 
-void Janik::inchDriveForward(float target, int speed)                 //takes target distance and speed as parameters
+void Janik::driveForward(double target, double speed)
 {
-  float x=0;                                                         //variable that will be current distance
+  double oneWheelDistance = target/xDriveCoeff;
+  double motorRotations = oneWheelDistance/ (PI * wheelDiameter);
+
+  double fwdSpeed  = speed * 200.0 / 100.0;
+  double backSpeed = speed * 0.95 * 200.0 / 100.0;
   
-  int revStart = LF.rotation(rev);
-  while(x<=target)                                                //proportional control feedback loop for error
+  RF.spinFor(fwd, motorRotations, rev, fwdSpeed, rpm, false);
+  LF.spinFor(fwd, motorRotations, rev, backSpeed, rpm, false);
+  RB.spinFor(fwd, motorRotations, rev, fwdSpeed, rpm, false);
+  LB.spinFor(fwd, motorRotations, rev, backSpeed, rpm, false);
+
+  while (RF.isSpinning() && LF.isSpinning() && RB.isSpinning() && LB.isSpinning())
   {
-    RF.spin(forward,speed,pct);
-    LF.spin(forward,speed*0.89,pct);
-    RB.spin(forward,speed,pct);
-    LB.spin(forward,speed*0.89,pct);
-    wait(10,msec);
-    x=(LF.rotation(rev) - revStart)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
+    wait(5, msec);
+  }
+
+  RF.stop(brake);
+  LF.stop(brake);                                            
+  RB.stop(brake);
+  LB.stop(brake);
+
+}
+
+void Janik::driveBackwards(double target, double speed)
+{
+  double oneWheelDistance = target/xDriveCoeff;
+  double motorRotations = oneWheelDistance/ (PI * wheelDiameter);
+
+  double fwdSpeed  = speed * 200.0 / 100.0;
+  double backSpeed = speed * 0.95 * 200.0 / 100.0;
+  
+  RB.spinFor(reverse, motorRotations, rev, backSpeed, rpm, false);
+  LB.spinFor(reverse, motorRotations, rev, fwdSpeed, rpm, false);
+  RF.spinFor(reverse, motorRotations, rev, backSpeed, rpm, false);
+  LF.spinFor(reverse, motorRotations, rev, fwdSpeed, rpm, false);
+
+
+  while (RF.isSpinning() && LF.isSpinning() && RB.isSpinning() && LB.isSpinning())
+  {
+    wait(10, msec);
+  }
+
+  LF.stop(brake);                                            
+  RF.stop(brake);
+  LB.stop(brake);
+  RB.stop(brake);
+}
+
+void Janik::inchDriveForward(double target, int speed)                 //takes target distance and speed as parameters
+{
+  double x = 0;                                                         //variable that will be current distance
+  
+  double revStart = LF.rotation(rev);
+  while(x <= target)                                                //proportional control feedback loop for error
+  {
+    RF.spin(forward, speed, pct);
+    LF.spin(forward, speed * 0.89, pct);
+    RB.spin(forward, speed, pct);
+    LB.spin(forward ,speed * 0.89, pct);
+    wait(10, msec);
+    x = (LF.rotation(rev) - revStart) * PI * wheelDiameter; // pi D        //distance =total rotations * circumference of 1 rotation
   }
   LF.stop(brake);                                              //stops motors once target is reached and loop finishes
   RF.stop(brake);
@@ -91,19 +141,19 @@ void Janik::inchDriveForward(float target, int speed)                 //takes ta
   RB.stop(brake);                                             //optional braking, will make motion more fluid
 }
 
-void Janik::inchDriveBackward(float target, int speed)                 //takes target distance and speed as parameters
+void Janik::inchDriveBackward(double target, int speed)                 //takes target distance and speed as parameters
 {
-  float x = 0;       
+  double x = 0;       
                                                     //variable that will be current distance
-  int revStart = -RF.rotation(rev);
-  while(x<=target)                                                //proportional control feedback loop for error
+  double revStart = -RF.rotation(rev);
+  while(x <= target)                                                //proportional control feedback loop for error
   {
-    LF.spin(reverse,speed,pct);
-    RF.spin(reverse,speed*0.89,pct);
-    RB.spin(reverse,speed*0.89,pct);
-    LB.spin(reverse,speed,pct);
-    wait(10,msec);
-    x=(-RF.rotation(rev) - revStart)*3.14*dia; // pi D        //distance =total rotations * circumference of 1 rotation
+    LF.spin(reverse, speed, pct);
+    RF.spin(reverse, speed * 0.89, pct);
+    RB.spin(reverse, speed * 0.89, pct);
+    LB.spin(reverse, speed, pct);
+    wait(10, msec);
+    x=(-RF.rotation(rev) - revStart) * PI * wheelDiameter; // pi D        //distance =total rotations * circumference of 1 rotation
   }
   LF.stop(brake);                                              //stops motors once target is reached and loop finishes
   RF.stop(brake);
