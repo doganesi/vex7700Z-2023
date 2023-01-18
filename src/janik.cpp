@@ -9,16 +9,16 @@ Janik::Janik(color allianceColor)
 
 void Janik::spinRollerHalf() //starts with one color facing the field
 {
-  Intake.spin(fwd, -60, percent);
-  wait(160, msec);
+  Intake.spin(fwd, 60, percent);
+  wait(200, msec);
   Intake.stop(brake);
 }
 
 
 void Janik::spinRollerFull() //starts with one color facing up
 {
-  Intake.spin(fwd, -60, percent);
-  wait(300, msec);
+  Intake.spin(fwd, 60, percent);
+  wait(350, msec);
   Intake.stop(brake);
 }
 
@@ -50,14 +50,16 @@ void Janik::spinRoller() //Use optical sensor
 
 void Janik::diskLaunch(int DiskQuantity)
 {
-  F1.spin(fwd, -69, pct);
-  wait(3000,  msec);
+  F1.spin (fwd, 600, rpm);
+  wait(2800,  msec); //was 3000
 
   for(int i = 0; i < DiskQuantity; i++) 
   {
     Indexer.spin(fwd, IndexerSpeed, pct);
     wait(IndexerActiveTime, msec);
     Indexer.stop();
+    //Indexer.spin(reverse, 80, pct);
+    //Indexer.stop();
     wait(IndexerBreak, msec);
   }
   
@@ -73,8 +75,8 @@ void Janik::deployExpansion()
 
 void Janik::driveForward(double target, double speed)
 {
-  double oneWheelDistance = target/xDriveCoeff;
-  double motorRotations = oneWheelDistance/ (PI * wheelDiameter);
+  double oneWheelDistance = target/xDriveCoeff + distanceError;
+   double motorRotations = oneWheelDistance/ (PI * wheelDiameter);
 
   double fwdSpeed  = speed * 200.0 / 100.0;
   double backSpeed = speed * 0.95 * 200.0 / 100.0;
@@ -98,7 +100,7 @@ void Janik::driveForward(double target, double speed)
 
 void Janik::driveBackwards(double target, double speed)
 {
-  double oneWheelDistance = target/xDriveCoeff;
+  double oneWheelDistance = target/xDriveCoeff + distanceError;
   double motorRotations = oneWheelDistance/ (PI * wheelDiameter);
 
   double fwdSpeed  = speed * 200.0 / 100.0;
@@ -120,6 +122,58 @@ void Janik::driveBackwards(double target, double speed)
   LB.stop(brake);
   RB.stop(brake);
 }
+
+void Janik::driveLeft(double target, double speed)
+{
+  double oneWheelDistance = target/xDriveCoeff;
+  double motorRotations = oneWheelDistance/ (PI * wheelDiameter);
+
+  double fwdSpeed  = speed * 200.0 / 100.0;
+  double backSpeed = speed * 0.95* 200.0 / 100.0;
+  
+  LB.spinFor(fwd, motorRotations, rev, backSpeed, rpm, false);
+  LF.spinFor(reverse, motorRotations, rev, fwdSpeed, rpm, false);
+  RB.spinFor(reverse, motorRotations, rev, backSpeed, rpm, false);
+  RF.spinFor(fwd, motorRotations, rev, fwdSpeed, rpm, false);
+  
+
+  while (RF.isSpinning() || LF.isSpinning() || RB.isSpinning() || LB.isSpinning())
+  {
+    wait(5, msec);
+  }
+
+  RB.stop(brake);
+  RF.stop(brake);
+  LF.stop(brake);                                            
+  LB.stop(brake);
+
+}
+
+void Janik::driveRight(double target, double speed)
+{
+  double oneWheelDistance = target/xDriveCoeff;
+  double motorRotations = oneWheelDistance/ (PI * wheelDiameter);
+
+  double fwdSpeed  = speed * 200.0 / 100.0;
+  double backSpeed = speed * 0.95 * 200.0 / 100.0;
+  
+  RF.spinFor(fwd, motorRotations, rev, fwdSpeed, rpm, false);
+  LF.spinFor(reverse, motorRotations, rev, backSpeed, rpm, false);
+  RB.spinFor(fwd, motorRotations, rev, fwdSpeed, rpm, false);
+  LB.spinFor(reverse, motorRotations, rev, backSpeed, rpm, false);
+
+  while (RF.isSpinning() && LF.isSpinning() && RB.isSpinning() && LB.isSpinning())
+  {
+    wait(5, msec);
+  }
+
+  RF.stop(brake);
+  LF.stop(brake);                                            
+  RB.stop(brake);
+  LB.stop(brake);
+
+}
+
 
 void Janik::inchDriveForward(double target, int speed)                 //takes target distance and speed as parameters
 {
@@ -187,6 +241,7 @@ void Janik::rotateRight(int rotationTime, int speed) // 585? rotates 90 degrees 
     LB.stop(brake);
     RB.stop(brake);  
 }
+
 void Janik::turnLeft(int turnTime, int speed)
 {
     RF.spin(fwd, speed, pct);
@@ -196,6 +251,8 @@ void Janik::turnLeft(int turnTime, int speed)
     RF.stop(brake);
 }
 
+
+
 void Janik::turnRight(int turnTime, int speed)
 {
     LF.spin(fwd, speed, pct);
@@ -203,6 +260,54 @@ void Janik::turnRight(int turnTime, int speed)
     wait(turnTime, msec);
     LB.stop(brake);
     LF.stop(brake);
+}
+
+void Janik::turnLeftStoppedWheel(motor stoppedMotor, double degrees, double speed)
+{
+  stoppedMotor.stop(brake);
+
+  double oneWheelDistance = PI*baseDiameter*degrees/360 +distanceError;
+  double motorRotations = oneWheelDistance/(PI*wheelDiameter);
+  double fwdSpeed  = speed * 200.0 / 100.0;
+  
+if (stoppedMotor.index() != RF.index())
+{
+   RF.spinFor(forward, motorRotations, rev, fwdSpeed, rpm, false);
+}
+
+if (stoppedMotor.index() != LF.index())
+{
+   LF.spinFor(reverse, motorRotations, rev, fwdSpeed, rpm, false);
+}
+
+if (stoppedMotor.index() != RB.index())
+{
+   RB.spinFor(forward, motorRotations, rev, fwdSpeed, rpm, false);
+}
+
+if (stoppedMotor.index() != LB.index())
+{
+   LB.spinFor(reverse, motorRotations, rev, fwdSpeed, rpm, false);
+}
+
+  while (RF.isSpinning() || LF.isSpinning() || RB.isSpinning() || LB.isSpinning())
+  {
+    wait(10, msec);
+  }
+
+  LF.stop(brake);                                            
+  RF.stop(brake);
+  LB.stop(brake);
+  RB.stop(brake);
+  //  RF.spin(fwd, speed, pct);
+  //   RB.spin(fwd, speed, pct);
+  //   LF.spin(reverse, speed, pct);
+  //   LB.spin(reverse, speed, pct);
+  //   wait(rotationTime, msec);
+  //   LF.stop(brake);                                              //stops motors once target is reached and loop finishes
+  //   RF.stop(brake);
+  //   LB.stop(brake);
+  //   RB.stop(brake);  
 }
 
 

@@ -236,25 +236,37 @@ void ProgrammingSkills()
 
 void autonRight()
 {
-  janik.diskLaunch(2);
-  janik.turnLeft(120,50);
-
-  janik.driveForward(26, 50);
-  janik.turnRight(1300, 50);
-
+  janik.driveForward(1, 30);
   janik.spinRollerHalf();
+
+  
+  // janik.diskLaunch(2);
+  // janik.turnLeft(120,50);
+
+  // janik.driveForward(26, 50);
+  // janik.turnRight(1300, 50);
+
+  // janik.spinRollerHalf();
 }
 
 void autonFront() 
 {
 
-  janik.diskLaunch(2);
+  janik.driveLeft(50, 70);
+  //janik.spinRollerHalf();
+  //janik.driveBackwards(7, 50);
 
-  janik.turnRight(120, 50);
-  janik.driveForward(26, 50);
-  janik.turnLeft(1500, 50);
+  //janik.turnLeftStoppedWheel(RB, 65, 70);
+
+  //janik.driveLeft(62, 100);
+
+  //janik.diskLaunch(2);
+
+  //janik.turnRight(120, 50);
+  //janik.driveForward(26, 50);
+  //janik.turnLeft(1500, 50);
   
-  janik.spinRollerHalf();  
+  //janik.spinRollerHalf();  
 }
 
 
@@ -271,8 +283,10 @@ void driver() {
     int spin = Controller1.Axis1.position();
 
     if (Controller1.ButtonA.pressing()) {
-      Pneu1.set(true);
-      Pneu2.set(true);
+
+      autonFront();
+      //Pneu1.set(true);
+      //Pneu2.set(true);
       
     } else if (Controller1.ButtonB.pressing()) {
       Pneu1.set(false);
@@ -286,7 +300,7 @@ void driver() {
       count = 0;
     }
     if (Controller1.ButtonLeft.pressing())
-      F1.spin(fwd, -69, pct);
+      F1.spin(fwd, 69, pct);
     if (Controller1.ButtonUp.pressing())
       targetSpeed = -60;
     if (Controller1.ButtonRight.pressing())
@@ -455,13 +469,13 @@ void pre_auton() {
 int main() {
 
   // Set up callbacks for autonomous and driver control periods.
- Competition.autonomous(auton);
- Competition.drivercontrol(driver);
+Competition.autonomous(auton);
+Competition.drivercontrol(driver);
   
 
   // Run the pre-autonomous function.
  pre_auton();
- //auton();
+
 
  
 
