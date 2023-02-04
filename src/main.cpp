@@ -19,13 +19,16 @@
 // F1                   motor         6               
 // Intake               motor         2               
 // Pneu1                digital_out   A               
-// CS                   optical       7               
 // LF                   motor         1               
 // Roller               motor         19              
 // Pneu2                digital_out   C               
+// Expansion            motor         15              
+// CS                   optical       7               
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
+#include <cmath>
+#include <algorithm>
 
 using namespace vex;
 
@@ -36,6 +39,7 @@ competition Competition;
 Janik janik(red);
 
 enum AutonOption {ALL, RED_RIGHT, RED_FRONT, BLUE_RIGHT, BLUE_FRONT, PROG };
+//enum LeadingSide {RIGHT, FRONT, BACK, LEFT};
 
 float dia=4.0;
 
@@ -112,6 +116,41 @@ void xDrive(int speed, int strafe, int spin, int wt) {
   RB.spin(forward, speed + strafe - spinSpeed, percent);
   wait(wt, msec);
 }
+
+void xDrive2(int speed, int strafe, int spin, int wt)
+{
+    //Get the raw sums of the X and Y joystick axes
+    double front_left  = (double)(speed + strafe + spin);
+    double back_left   = (double)(speed - strafe + spin);
+    double front_right = (double)(speed - strafe - spin);
+    double back_right  = (double)(speed + strafe - spin);
+    
+    //Find the largest possible sum of X and Y
+    double max_raw_sum = (double)(abs(speed) + abs(strafe));
+    
+     //Find the desired speed of movement
+    double desiredSpeed = sqrt((double)(speed*speed + strafe*strafe));
+
+    
+    //The largest sum will be scaled down to the desired speed, and the others will be
+    //scaled by the same amount to preserve directionality
+    if (max_raw_sum != 0) 
+    {
+        front_left  = front_left / max_raw_sum * desiredSpeed;
+        back_left   = back_left / max_raw_sum * desiredSpeed;
+        front_right = front_right / max_raw_sum * desiredSpeed;
+        back_right  = back_right / max_raw_sum * desiredSpeed;
+    }
+    
+
+    //Send the values to the motors
+    LF.spin(fwd,front_left, velocityUnits::pct);
+    LB.spin(fwd,back_left,  velocityUnits::pct);
+    RF.spin(fwd,front_right,velocityUnits::pct);
+    RB.spin(fwd,back_right, velocityUnits::pct);
+}
+
+
 
 // void driveMonitor() {
 //   Brain.Screen.printAt(1, 20, "Drive Monitor");
@@ -192,27 +231,29 @@ void driveBrake() {
 void ProgrammingSkills() 
 {
   
-  janik.diskLaunch(2); //Launch preloads
+  janik.diskLaunch(2, 1200); //Launch preloads
 
-  //janik.inchDriveForward(25, 50);
-  janik.turnRight(120, 50); //straighten
-  janik.driveForward(27, 50);
   janik.turnLeft(1500, 50);
   
   janik.spinRollerFull(); //First Roller
 
-  janik.driveBackwards(28, 50);
-  janik.turnRight(1300, 50);
-  janik.driveForward(13.5, 50);
+  janik.driveBackwards(5, 70);
 
-  wait(100, msec);
-  // janik.inchDriveForward(17, 50);
+  janik.turnRightArc(FRONT, 6, 87, 100);
+
+  janik.driveForward(7, 100);
 
   janik.spinRollerFull(); //Second Roller
 
-  janik.driveBackwards(22, 50);
+  janik.driveBackwards(7, 70);
+
+  janik.turnLeftArc(FRONT, 7, 40, 100);
   
-  janik.turnLeft(1250, 50);
+  //janik.driveLeftP(2, 50);
+
+  janik.deployExpansion(); //Expand
+  
+  // janik.turnLeft(1250, 50);
 
   // janik.moveDiagonally(4500); //4500 takes across the full diagonal
   // janik.inchDriveBackward(24.5, 30);
@@ -226,10 +267,14 @@ void ProgrammingSkills()
 
   // janik.spinRollerFull(); //Fourth Roller
 
-  // janik.inchDriveBackward(10,50);
-  // janik.rotateLeft(600, 50);
+  // janik.driveBackwards(10,50);
+  // janik.turnLeftStoppedWheel(RB, 45, 100);
+  // //janik.rotateLeft(400, 50);
 
-  janik.deployExpansion(); //Expand
+  // janik.deployExpansion(); //Expand
+
+
+
 
 }
 
@@ -252,15 +297,30 @@ void autonRight()
 void autonFront() 
 {
 
-  janik.driveLeft(50, 70);
-  //janik.spinRollerHalf();
-  //janik.driveBackwards(7, 50);
+// Expansion.spin(reverse, 100, pct);
+// wait(3, sec);
+// Expansion.stop();
 
-  //janik.turnLeftStoppedWheel(RB, 65, 70);
 
-  //janik.driveLeft(62, 100);
+  janik.driveForward(2, 70);
+  janik.spinRollerHalf();
+  janik.driveBackwards(5, 50);
 
-  //janik.diskLaunch(2);
+  janik.turnLeftStoppedWheel(RB, 42, 100);
+
+  janik.driveLeftP(65,100);
+
+  janik.diskLaunch(2, 1300);
+
+  janik.driveForward(20, 100);
+
+  // janik.driveLeft(80, 100);
+
+  // janik.turnLeftStoppedWheel(RB, 47, 100);
+
+  // janik.driveForward(5, 50);
+  // janik.spinRollerHalf();
+
 
   //janik.turnRight(120, 50);
   //janik.driveForward(26, 50);
@@ -282,18 +342,33 @@ void driver() {
     int strafe = Controller1.Axis4.position();
     int spin = Controller1.Axis1.position();
 
-    if (Controller1.ButtonA.pressing()) {
+    if (Controller1.ButtonA.pressing()) { //Expansion
 
-      autonFront();
+     //ProgrammingSkills();
+
+      janik.deployExpansion();
+      //autonFront();
       //Pneu1.set(true);
       //Pneu2.set(true);
       
-    } else if (Controller1.ButtonB.pressing()) {
-      Pneu1.set(false);
-      Pneu2.set(false);
+    } else if (Controller1.ButtonB.pressing()) { // No used
+
+        ProgrammingSkills();
+        // RF.stop(brake);
+        // LF.stop(brake);                                            
+        // RB.stop(brake);
+        // LB.stop(brake);
+      // Pneu1.set(false);
+      // Pneu2.set(false);
     }
 
-    xDrive(speed, strafe, spin, 10);
+    else if (Controller1.ButtonX.pressing())
+    {
+      autonFront();
+    }
+   
+
+    xDrive2(speed, strafe, spin, 10);
     count++;
     if (count >= 50) {
       //driveMonitor();
@@ -475,8 +550,9 @@ Competition.drivercontrol(driver);
 
   // Run the pre-autonomous function.
  pre_auton();
-
-
+//Expansion.spin(reverse, 100, pct);
+//wait(5, sec);
+//Expansion.stop();
  
 
   // Prevent main from exiting with an infinite loop.

@@ -17,10 +17,11 @@ inertial GyroSensor = inertial(PORT16);
 motor F1 = motor(PORT6, ratio18_1, false);
 motor Intake = motor(PORT2, ratio18_1, false);
 digital_out Pneu1 = digital_out(Brain.ThreeWirePort.A);
-optical CS = optical(PORT7);
 motor LF = motor(PORT1, ratio18_1, false);
 motor Roller = motor(PORT19, ratio18_1, false);
 digital_out Pneu2 = digital_out(Brain.ThreeWirePort.C);
+motor Expansion = motor(PORT15, ratio18_1, false);
+optical CS = optical(PORT7);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

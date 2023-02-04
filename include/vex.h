@@ -18,6 +18,7 @@
 #include "robot-config.h"
 #include "janik.h"
 
+
 #define waitUntil(condition)                                                   \
   do {                                                                         \
     wait(5, msec);                                                             \
